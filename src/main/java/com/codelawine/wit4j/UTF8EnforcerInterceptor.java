@@ -14,28 +14,29 @@
  * limitations under the License.
  */
 
-package at.becker.wit4j;
+package com.codelawine.wit4j;
 
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.ReaderInterceptor;
+import javax.ws.rs.ext.ReaderInterceptorContext;
 import java.io.IOException;
 
 /**
  * Created
  * by Moritz Becker (moritz.becker@gmx.at)
- * on 23.08.2016.
+ * on 01.09.2016.
+ *
+ * Explicitely appends UTF-8 charset to the content-type as workaround for RESTEASY-1482
  */
-public class AuthenticationFilter implements ClientRequestFilter {
-
-    private final String witAccessToken;
-
-    public AuthenticationFilter(String witAccessToken) {
-        this.witAccessToken = witAccessToken;
-    }
+public class UTF8EnforcerInterceptor implements ReaderInterceptor {
 
     @Override
-    public void filter(ClientRequestContext requestContext) throws IOException {
-        requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION, "Bearer " + witAccessToken);
+    public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException, WebApplicationException {
+        if (MediaType.APPLICATION_JSON_TYPE.equals(context.getMediaType())) {
+            context.setMediaType(context.getMediaType().withCharset("utf-8"));
+        }
+        return context.proceed();
     }
+
 }
