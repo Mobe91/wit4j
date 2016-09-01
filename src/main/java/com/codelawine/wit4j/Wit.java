@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package at.becker.wit4j;
+package com.codelawine.wit4j;
 
 import javax.json.JsonObject;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.core.MediaType;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;

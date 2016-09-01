@@ -14,33 +14,28 @@
  * limitations under the License.
  */
 
-package at.becker.wit4j;
+package com.codelawine.wit4j;
 
-import javax.json.JsonObject;
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientRequestFilter;
+import javax.ws.rs.core.HttpHeaders;
+import java.io.IOException;
 
 /**
  * Created
  * by Moritz Becker (moritz.becker@gmx.at)
  * on 23.08.2016.
- *
- * Interface for implementing custom actions.
  */
-public interface Action {
+public class AuthenticationFilter implements ClientRequestFilter {
 
-    /**
-     * The returned name refers to a custom action in wit.ai.
-     * @return the name of the custom action
-     */
-    public String getName();
+    private final String witAccessToken;
 
-    /**
-     * Performs the action.
-     *
-     * @param params
-     * For a {@link Wit#SEND_ACTION}: WitRequest, WitResponse
-     * For other actions: WitRequest
-     * @return new context or null in case of {@link Wit#SEND_ACTION}
-     */
-    public JsonObject perform(Object... params);
+    public AuthenticationFilter(String witAccessToken) {
+        this.witAccessToken = witAccessToken;
+    }
 
+    @Override
+    public void filter(ClientRequestContext requestContext) throws IOException {
+        requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION, "Bearer " + witAccessToken);
+    }
 }

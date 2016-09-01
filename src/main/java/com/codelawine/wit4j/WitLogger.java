@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package at.becker.wit4j;
+package com.codelawine.wit4j;
 
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientResponseContext;
