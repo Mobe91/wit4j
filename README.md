@@ -8,7 +8,7 @@ Wit4j uses the JAX-RS 2.0 client API and you need to add a proper implementation
 
 ```
 <dependency>
-    <groupId>at.becker.wit4j</groupId>
+    <groupId>com.codelawine.wit4j</groupId>
     <artifactId>wit4j-core</artifactId>
     <version>LATEST</version>
 </dependency>
