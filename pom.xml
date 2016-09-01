@@ -6,7 +6,7 @@
 
     <groupId>at.becker.wit4j</groupId>
     <artifactId>wit4j-core</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <name>Wit4j</name>
 
