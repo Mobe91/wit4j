@@ -6,7 +6,7 @@
 
     <groupId>com.codelawine.wit4j</groupId>
     <artifactId>wit4j-core</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
 
     <name>Wit4j</name>
     <description>Wit4j is a java client/SDK for wit.ai.</description>
