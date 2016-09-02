@@ -1,6 +1,6 @@
 # Wit4j
 
-Wit4j is a java client for [Wit.ai](https://wit.ai) quite analogous to the Node.js client under https://github.com/wit-ai/node-wit.
+Wit4j is a java client/SDK for [Wit.ai](https://wit.ai) quite analogous to the Node.js client under https://github.com/wit-ai/node-wit.
  
 ## Getting Started
 
