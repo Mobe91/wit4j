@@ -21,8 +21,6 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.MediaType;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -68,19 +66,15 @@ public class Wit {
      * @return the JSON response of the invocation
      */
     public JsonObject message(String message) {
-        try {
-            return ClientBuilder.newClient().target(witUrl)
-                    .register(authenticationFilter)
-                    .path("message")
-                    .queryParam("q", URLEncoder.encode(message, "UTF-8"))
-                    .queryParam("v", witApiVersion)
-                    .register(WitLogger.class)
-                    .register(UTF8EnforcerInterceptor.class)
-                    .request(MediaType.APPLICATION_JSON_TYPE.withCharset("utf-8"))
-                    .get(JsonObject.class);
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        return ClientBuilder.newClient().target(witUrl)
+                .register(authenticationFilter)
+                .path("message")
+                .queryParam("q", message)
+                .queryParam("v", witApiVersion)
+                .register(WitLogger.class)
+                .register(UTF8EnforcerInterceptor.class)
+                .request(MediaType.APPLICATION_JSON_TYPE.withCharset("utf-8"))
+                .get(JsonObject.class);
     }
 
     /**
@@ -98,19 +92,15 @@ public class Wit {
     }
 
     private Invocation.Builder converse0(String sessionId, String message) {
-        try {
-            return ClientBuilder.newClient().target(witUrl)
-                    .register(authenticationFilter)
-                    .path("converse")
-                    .queryParam("session_id", URLEncoder.encode(sessionId, "UTF-8"))
-                    .queryParam("q", message == null ? null : URLEncoder.encode(message, "UTF-8"))
-                    .queryParam("v", witApiVersion)
-                    .register(WitLogger.class)
-                    .register(UTF8EnforcerInterceptor.class)
-                    .request(MediaType.APPLICATION_JSON_TYPE.withCharset("utf-8"));
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        return ClientBuilder.newClient().target(witUrl)
+                .register(authenticationFilter)
+                .path("converse")
+                .queryParam("session_id", sessionId)
+                .queryParam("q", message)
+                .queryParam("v", witApiVersion)
+                .register(WitLogger.class)
+                .register(UTF8EnforcerInterceptor.class)
+                .request(MediaType.APPLICATION_JSON_TYPE.withCharset("utf-8"));
     }
 
     /**
