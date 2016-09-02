@@ -19,10 +19,7 @@ package com.codelawine.wit4j;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,7 +50,7 @@ public class WitLogger implements ClientResponseFilter {
             byte[] rawEntity = bos.toByteArray();
             responseContext.setEntityStream(new ByteArrayInputStream(rawEntity));
             sb.append("\nResponse:\n");
-            sb.append(requestContext.getHeaders().toString() + "\n" + new String(rawEntity, Charset.forName("UTF-8")));
+            sb.append(responseContext.getHeaders().toString() + "\n" + new String(rawEntity, Charset.forName("UTF-8")));
             LOG.fine(sb.toString());
         }
     }
