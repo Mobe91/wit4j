@@ -17,15 +17,12 @@
 package com.codelawine.wit4j;
 
 import javax.json.JsonObject;
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.MediaType;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * Created
@@ -36,26 +33,14 @@ public class Wit {
 
     public static final String SEND_ACTION = "send";
 
-    private static final String DEFAULT_URL = "https://api.wit.ai";
-    private static final Integer DEFAULT_MAX_STEPS = 5;
-
     private static final Logger LOG = Logger.getLogger(Wit.class.getName());
 
-    private final String witUrl;
-    private final String witApiVersion;
+    private final WitConfiguration configuration;
     private final AuthenticationFilter authenticationFilter;
-    private final Map<String, Action> actions;
 
-    public Wit(String witAccessToken, String witUrl, String witApiVersion, Set<Action> actions) {
-        this.authenticationFilter = new AuthenticationFilter(witAccessToken);
-        this.witUrl = witUrl;
-        this.witApiVersion = witApiVersion;
-        this.actions = actions.stream().collect(Collectors.toMap(action -> action.getName(), Function.identity()));
-        validateActions(this.actions);
-    }
-
-    public Wit(String witAccessToken, String witApiVersion, Set<Action> actions) {
-        this(witAccessToken, DEFAULT_URL, witApiVersion, actions);
+    public Wit(WitConfiguration configuration) {
+        this.configuration = configuration;
+        this.authenticationFilter = new AuthenticationFilter(configuration.getWitAccessToken());
     }
 
     /**
@@ -66,11 +51,11 @@ public class Wit {
      * @return the JSON response of the invocation
      */
     public JsonObject message(String message) {
-        return ClientBuilder.newClient().target(witUrl)
+        return createClient().target(configuration.getWitUrl())
                 .register(authenticationFilter)
                 .path("message")
                 .queryParam("q", message)
-                .queryParam("v", witApiVersion)
+                .queryParam("v", configuration.getWitApiVersion())
                 .register(WitLogger.class)
                 .register(UTF8EnforcerInterceptor.class)
                 .request(MediaType.APPLICATION_JSON_TYPE.withCharset("utf-8"))
@@ -92,12 +77,12 @@ public class Wit {
     }
 
     private Invocation.Builder converse0(String sessionId, String message) {
-        return ClientBuilder.newClient().target(witUrl)
+        return createClient().target(configuration.getWitUrl())
                 .register(authenticationFilter)
                 .path("converse")
                 .queryParam("session_id", sessionId)
                 .queryParam("q", message)
-                .queryParam("v", witApiVersion)
+                .queryParam("v", configuration.getWitApiVersion())
                 .register(WitLogger.class)
                 .register(UTF8EnforcerInterceptor.class)
                 .request(MediaType.APPLICATION_JSON_TYPE.withCharset("utf-8"));
@@ -113,7 +98,7 @@ public class Wit {
      * @return new context
      */
     public JsonObject runActions(String sessionId, String message, JsonObject context) {
-        return runActions(sessionId, message, context, DEFAULT_MAX_STEPS);
+        return runActions(sessionId, message, context, configuration.getMaxSteps());
     }
 
     /**
@@ -141,7 +126,7 @@ public class Wit {
             return context;
         } else if ("msg".equals(type)) {
             WitResponse response = new WitResponse(converseResponse.getString("msg"), converseResponse.getJsonObject("quickreplies"));
-            Action send = actions.get(SEND_ACTION);
+            Action send = configuration.getActions().get(SEND_ACTION);
             JsonObject ctx = send.perform(request, response);
             if (ctx != null) {
                 throw new RuntimeException("Cannot context after '" + SEND_ACTION + "' action.");
@@ -151,7 +136,7 @@ public class Wit {
             if (converseResponse.isNull("action")) {
                 return context;
             } else {
-                Action action = actions.get(converseResponse.getString("action"));
+                Action action = configuration.getActions().get(converseResponse.getString("action"));
                 if (action == null) {
                     throw new RuntimeException("Unknown action '" + converseResponse.getString("action") + "' requested.");
                 }
@@ -163,17 +148,11 @@ public class Wit {
         }
     }
 
-    private static void validateActions(Map<String, Action> actions) {
-        if (!actions.containsKey(SEND_ACTION)) {
-            throw new RuntimeException("The '" + SEND_ACTION + "' action is missing.");
-        }
-
-        for (String actionName : actions.keySet()) {
-            if ("say".equals(actionName) ||
-                    "merge".equals(actionName) ||
-                    "error".equals(actionName)) {
-                throw new RuntimeException("The '" + actionName + "' action has been deprecated.");
-            }
+    private Client createClient() {
+        if (configuration.getProvidedClientBuilder() == null) {
+            return ClientBuilder.newClient();
+        } else {
+            return configuration.getProvidedClientBuilder().newClient();
         }
     }
 }
