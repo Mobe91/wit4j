@@ -28,10 +28,14 @@ public class Wit4jExample {
     private final Wit wit;
     
     public Wit4jExample() {
-        // register custom actions
-        Set<Action> actions = new HashSet<>();
-        actions.add(new MySendAction());
-        actions.add(new DoStuffAction());
+        WitConfiguration witConfig = WitConfiguration.newBuilder()
+                    // register custom actions
+                    .registerAction(new MySendAction())
+                    .registerAction(new DoStuffAction())
+                    .withWitAccessToken(config.getWitAccessToken())
+                    .withWitApiVersion(WIT_API_VERSION)
+                    .build();
+
         // create wit.ai client
         wit = new Wit(config.getWitAccessToken(), WIT_API_VERSION, actions);
     }
