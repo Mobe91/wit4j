@@ -108,13 +108,9 @@ public class Sessions {
    public Session getOrCreateSession(String senderId) {
         Session session = sessionsById.get(senderId);
         if (session == null) {
-            synchronized (sessionsById) {
-                session = sessionsById.get(senderId);
-                if (session == null) {
-                    session = new Session(senderId);
-                    sessionsById.put(senderId, session);
-                }
-            }
+            session = new Session(senderId);
+            Session existingSession = sessionsById.putIfAbsent(senderId, session);
+            session = existingSession == null ? session : existingSession;
         }
         return session;
     }
